@@ -1,0 +1,26 @@
+#数据集不上传到git
+data/
+
+# Byte编译的Python文件
+*.pyc
+__pycache__/
+
+# 环境变量文件
+.env
+
+# 虚拟环境
+venv/
+.venv/
+
+# IDE设置文件
+.idea/
+*.iml
+
+# 日志文件
+*.log
+
+# Jupyter Notebook检查点
+.ipynb_checkpoints/
+
+# 本地配置文件
+*.local
