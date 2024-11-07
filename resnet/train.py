@@ -2,6 +2,7 @@ import json
 import os
 import sys
 
+import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -84,8 +85,12 @@ def main():
     params = [p for p in net.parameters() if p.requires_grad]
     optimizer = optim.Adam(params, lr=0.0001)
 
+    # 记录损失和准确率，用于画图
+    train_loss_list = []
+    val_acc_list = []
+
     # 开始训练
-    epochs = 5
+    epochs = 20
     best_acc = 0.0
     save_path = '../model/resNet34.pth'
     train_steps = len(train_loader)
@@ -101,11 +106,13 @@ def main():
             loss = loss_function(outputs, labels.to(device))
             loss.backward()  # 反向传播
             optimizer.step()  # 更新参数
-
             # print statistics
             running_loss += loss.item()
-
             train_bar.desc = "train epoch[{}/{}] loss:{:.3f}".format(epoch + 1, epochs, loss)
+
+        # 记录平均训练损失
+        train_loss = running_loss / train_steps
+        train_loss_list.append(train_loss)
 
         # validate
         net.eval()
@@ -123,15 +130,28 @@ def main():
 
         # 测试正确的样本数 / 总样本数
         val_accurate = acc / val_num
+        val_acc_list.append(val_accurate)
+
         print('[epoch %d] train_loss: %.3f  val_accuracy: %.3f' %
-              (epoch + 1, running_loss / train_steps, val_accurate))
+              (epoch + 1, train_loss, val_accurate))
 
         # save best model
         if val_accurate > best_acc:
             best_acc = val_accurate
             torch.save(net.state_dict(), save_path)
+            print(f'save model, epoch {epoch + 1}, val_accurate {val_accurate}')
 
-    print('Finished Training')
+    print('Finished Training, Best Accuracy: %.3f' % best_acc)
+
+    # 绘制损失和准确率曲线
+    plt.figure()
+    plt.plot(range(1, epochs + 1), train_loss_list, label='Train Loss')
+    plt.plot(range(1, epochs + 1), val_acc_list, label='Validation Accuracy')
+    plt.xlabel('Epochs')
+    plt.ylabel('Value')
+    plt.title('Training Loss and Validation Accuracy')
+    plt.legend()
+    plt.show()
 
 
 if __name__ == '__main__':
