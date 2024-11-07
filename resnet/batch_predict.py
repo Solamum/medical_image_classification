@@ -19,10 +19,13 @@ def main():
 
     # load image
     # 指向需要遍历预测的图像文件夹
-    imgs_root = "/data/imgs"
-    assert os.path.exists(imgs_root), f"file: '{imgs_root}' dose not exist."
+    imgs_root1 = "../data/2-MedImage-TestSet/disease"
+    assert os.path.exists(imgs_root1), f"file: '{imgs_root1}' dose not exist."
+    imgs_root2 = "../data/2-MedImage-TestSet/normal"
+    assert os.path.exists(imgs_root2), f"file: '{imgs_root2}' dose not exist."
     # 读取指定文件夹下所有jpg图像路径
-    img_path_list = [os.path.join(imgs_root, i) for i in os.listdir(imgs_root) if i.endswith(".jpg")]
+    img_path_list = ([os.path.join(imgs_root1, i) for i in os.listdir(imgs_root1) if i.endswith(".jpg")] + [
+        os.path.join(imgs_root2, i) for i in os.listdir(imgs_root2) if i.endswith(".jpg")])
 
     # read class_indict
     json_path = './class_indices.json'
@@ -35,7 +38,7 @@ def main():
     model = resnet34(num_classes=2).to(device)
 
     # load model weights
-    weights_path = "./resNet34.pth"
+    weights_path = "../model/resNet34.pth"
     assert os.path.exists(weights_path), f"file: '{weights_path}' dose not exist."
     model.load_state_dict(torch.load(weights_path, map_location=device))
 
