@@ -88,9 +88,10 @@ def main():
     # 记录损失和准确率，用于画图
     train_loss_list = []
     val_acc_list = []
+    train_acc_list = []
 
     # 开始训练
-    epochs = 20
+    epochs = 10
     best_acc = 0.0
     save_path = '../model/resNet34.pth'
     train_steps = len(train_loader)
@@ -98,6 +99,7 @@ def main():
         # train
         net.train()
         running_loss = 0.0
+        train_acc = 0.0
         train_bar = tqdm(train_loader, file=sys.stdout)
         for step, data in enumerate(train_bar):
             images, labels = data
@@ -108,11 +110,18 @@ def main():
             optimizer.step()  # 更新参数
             # print statistics
             running_loss += loss.item()
+
+            # Calculate training accuracy
+            predict_y = torch.max(outputs, dim=1)[1]
+            train_acc += torch.eq(predict_y, labels.to(device)).sum().item()
+
             train_bar.desc = "train epoch[{}/{}] loss:{:.3f}".format(epoch + 1, epochs, loss)
 
-        # 记录平均训练损失
+        # 记录平均训练损失和训练准确率
         train_loss = running_loss / train_steps
         train_loss_list.append(train_loss)
+        train_accuracy = train_acc / train_num
+        train_acc_list.append(train_accuracy)
 
         # validate
         net.eval()
@@ -132,8 +141,8 @@ def main():
         val_accurate = acc / val_num
         val_acc_list.append(val_accurate)
 
-        print('[epoch %d] train_loss: %.3f  val_accuracy: %.3f' %
-              (epoch + 1, train_loss, val_accurate))
+        print('[epoch %d] train_loss: %.3f  train_accuracy: %.3f  val_accuracy: %.3f' %
+              (epoch + 1, train_loss, train_accuracy, val_accurate))
 
         # save best model
         if val_accurate > best_acc:
@@ -147,9 +156,10 @@ def main():
     plt.figure()
     plt.plot(range(1, epochs + 1), train_loss_list, label='Train Loss')
     plt.plot(range(1, epochs + 1), val_acc_list, label='Validation Accuracy')
+    plt.plot(range(1, epochs + 1), train_acc_list, label='Training Accuracy')
     plt.xlabel('Epochs')
     plt.ylabel('Value')
-    plt.title('Training Loss and Validation Accuracy')
+    plt.title('Loss and Accuracy')
     plt.legend()
     plt.show()
 
