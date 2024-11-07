@@ -1,11 +1,14 @@
 import json
 import os
 import sys
+import time
 
 import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from torch.utils.data import DataLoader
 from torchvision import transforms, datasets
 from tqdm import tqdm
 
@@ -15,6 +18,11 @@ from model import resnet34
 def main():
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print("using {} device.".format(device))
+
+    # 超参数
+    batch_size = 16
+    epochs = 10
+    lr = 0.0001
 
     # 数据加载和预处理
     data_transform = {
@@ -43,35 +51,25 @@ def main():
     with open('class_indices.json', 'w') as json_file:
         json_file.write(json_str)
 
-    batch_size = 16
     nw = min([os.cpu_count(), batch_size if batch_size > 1 else 0, 8])  # number of workers
     print('Using {} dataloader workers every process'.format(nw))
 
     # 加载训练集和测试集
-    train_loader = torch.utils.data.DataLoader(train_dataset,
-                                               batch_size=batch_size, shuffle=True,
-                                               num_workers=nw)
-
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=nw)
     validate_dataset = datasets.ImageFolder(root=os.path.join(image_path, "2-MedImage-TestSet"),
                                             transform=data_transform["val"])
     val_num = len(validate_dataset)
-    validate_loader = torch.utils.data.DataLoader(validate_dataset,
-                                                  batch_size=batch_size, shuffle=False,
-                                                  num_workers=nw)
+    validate_loader = DataLoader(validate_dataset, batch_size=batch_size, shuffle=False, num_workers=nw)
 
-    print("using {} images for training, {} images for validation.".format(train_num,
-                                                                           val_num))
+    print("using {} images for training, {} images for validation.\n".format(train_num, val_num))
 
-    # 载入预训练模型
+    # 载入预训练模型参数
     net = resnet34()
     # load pretrain weights
     # download url: https://download.pytorch.org/models/resnet34-333f7ec4.pth
     model_weight_path = "./resnet34-pre.pth"
     assert os.path.exists(model_weight_path), "file {} does not exist.".format(model_weight_path)
     net.load_state_dict(torch.load(model_weight_path, map_location='cpu'))
-    # for param in net.parameters():
-    #     param.requires_grad = False
-
     # change fc layer structure
     in_channel = net.fc.in_features
     net.fc = nn.Linear(in_channel, 2)  # change output layer to 2 classes
@@ -80,21 +78,25 @@ def main():
     # 定义损失函数和优化器
     # define loss function
     loss_function = nn.CrossEntropyLoss()
-
     # construct an optimizer
     params = [p for p in net.parameters() if p.requires_grad]
-    optimizer = optim.Adam(params, lr=0.0001)
+    optimizer = optim.Adam(params, lr=lr)
 
-    # 记录损失和准确率，用于画图
+    # 记录每个epoch的指标，用于画图
     train_loss_list = []
-    val_acc_list = []
     train_acc_list = []
+    val_acc_list = []
+    val_precision_list = []
+    val_recall_list = []
+    val_f1_list = []
+    val_auc_list = []
 
     # 开始训练
-    epochs = 10
-    best_acc = 0.0
-    save_path = '../model/resNet34.pth'
+    best_metric = 0.0  # 最佳综合指标，这里取 Accuracy, F1-Score, AUC 的加权平均值
+    saved_acc = 0.0  # 保存的最佳模型的准确率
+    save_path = '../model/resNet34-best.pth'
     train_steps = len(train_loader)
+    start = time.time()
     for epoch in range(epochs):
         # train
         net.train()
@@ -108,49 +110,84 @@ def main():
             loss = loss_function(outputs, labels.to(device))
             loss.backward()  # 反向传播
             optimizer.step()  # 更新参数
-            # print statistics
+            # 记录训练损失
             running_loss += loss.item()
 
-            # Calculate training accuracy
+            # 计算训练过程中的准确率
             predict_y = torch.max(outputs, dim=1)[1]
             train_acc += torch.eq(predict_y, labels.to(device)).sum().item()
 
             train_bar.desc = "train epoch[{}/{}] loss:{:.3f}".format(epoch + 1, epochs, loss)
 
-        # 记录平均训练损失和训练准确率
+        # 平均训练损失
         train_loss = running_loss / train_steps
         train_loss_list.append(train_loss)
+        # 训练过程中的准确率：预测正确的样本数 / 总样本数
         train_accuracy = train_acc / train_num
         train_acc_list.append(train_accuracy)
 
         # validate
         net.eval()
-        acc = 0.0  # accumulate accurate number / epoch
+        all_preds = []  # 所有预测值
+        all_labels = []  # 实际标签
+        all_probs = []  # 所有预测概率值
         with torch.no_grad():
             val_bar = tqdm(validate_loader, file=sys.stdout)
             for val_data in val_bar:
                 val_images, val_labels = val_data
                 outputs = net(val_images.to(device))
-                # loss = loss_function(outputs, test_labels)
                 predict_y = torch.max(outputs, dim=1)[1]
-                acc += torch.eq(predict_y, val_labels.to(device)).sum().item()
+
+                # 累积所有预测值和标签
+                all_preds.extend(predict_y.cpu().numpy())
+                all_labels.extend(val_labels.cpu().numpy())
+                # 收集概率值以用于 AUC 计算
+                probs = torch.softmax(outputs, dim=1)[:, 1].cpu().numpy()
+                all_probs.extend(probs)
 
                 val_bar.desc = "valid epoch[{}/{}]".format(epoch + 1, epochs)
 
-        # 测试正确的样本数 / 总样本数
-        val_accurate = acc / val_num
-        val_acc_list.append(val_accurate)
+        # 计算 Accuracy, Precision, Recall, F1-Score, AUC
+        accuracy = accuracy_score(all_labels, all_preds)
+        precision = precision_score(all_labels, all_preds, average='binary')
+        recall = recall_score(all_labels, all_preds, average='binary')
+        f1 = f1_score(all_labels, all_preds, average='binary')
+        auc = roc_auc_score(all_labels, all_probs)
+        # 记录指标
+        val_acc_list.append(accuracy)
+        val_precision_list.append(precision)
+        val_recall_list.append(recall)
+        val_f1_list.append(f1)
+        val_auc_list.append(auc)
 
-        print('[epoch %d] train_loss: %.3f  train_accuracy: %.3f  val_accuracy: %.3f' %
-              (epoch + 1, train_loss, train_accuracy, val_accurate))
+        print("| {:^6} | {:^10} | {:^17} | {:^19} | {:^9} | {:^6} | {:^8} | {:^6} |".format(
+            "Epoch", "Train Loss", "Training Accuracy", "Validation Accuracy", "Precision", "Recall", "F1-Score",
+            "AUC"))
+        print("| {:^6} | {:^10.3f} | {:^17.3f} | {:^19.3f} | {:^9.3f} | {:^6.3f} | {:^8.3f} | {:^6.3f} |\n".format(
+            epoch + 1, train_loss, train_accuracy, accuracy, precision, recall, f1, auc))
 
-        # save best model
-        if val_accurate > best_acc:
-            best_acc = val_accurate
+        # todo: ROC metric
+        # # 绘制 ROC 曲线
+        # fpr, tpr, thresholds = roc_curve(all_labels, all_probs)
+        # plt.figure()
+        # plt.plot(fpr, tpr, label=f'ROC curve (area = {auc:.3f})')
+        # plt.xlabel('False Positive Rate')
+        # plt.ylabel('True Positive Rate')
+        # plt.title('ROC Curve')
+        # plt.legend(loc="lower right")
+        # plt.show()
+
+        # 保存最佳模型，综合考虑 Accuracy, F1, AUC 的加权平均值
+        combined_metric = 0.6 * accuracy + 0.2 * f1 + 0.2 * auc  # 可以调整权重
+        if combined_metric > best_metric:
+            best_metric = combined_metric
+            saved_acc = accuracy
             torch.save(net.state_dict(), save_path)
-            print(f'save model, epoch {epoch + 1}, val_accurate {val_accurate}')
+            print(f'Save model, Epoch {epoch + 1}, Combined Metric {combined_metric:.3f}, Accuracy {accuracy:.3f}\n')
 
-    print('Finished Training, Best Accuracy: %.3f' % best_acc)
+    end = time.time()
+    minutes = (end - start) / 60
+    print(f'模型训练结束，用时 {minutes:.3f} 分钟，Best Combined Metric {best_metric:.3f}, Accuracy {saved_acc:.3f}\n')
 
     # 绘制损失和准确率曲线
     plt.figure()
