@@ -2,7 +2,7 @@
 data/
 
 # resnet预训练参数
-.pth
+*.pth
 
 # Byte编译的Python文件
 *.pyc
@@ -27,3 +27,4 @@ venv/
 
 # 本地配置文件
 *.local
+
