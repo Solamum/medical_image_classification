@@ -21,7 +21,7 @@ def main():
 
     # 超参数
     batch_size = 16
-    epochs = 10
+    epochs = 50
     lr = 0.0001
 
     # 数据加载和预处理
@@ -90,12 +90,20 @@ def main():
     val_recall_list = []
     val_f1_list = []
     val_auc_list = []
+    combined_metric_list = []
 
     # 开始训练
     best_metric = 0.0  # 最佳综合指标，这里取 Accuracy, F1-Score, AUC 的加权平均值
     saved_acc = 0.0  # 保存的最佳模型的准确率
     save_path = '../model/resNet34-best.pth'
     train_steps = len(train_loader)
+
+    # 早停法：当连续 patience 个 epoch 验证集指标没有提升时，提前停止训练
+    patience = 5  # 根据需要调整
+    counter = 0
+    early_stop = False
+
+    print(f'开始训练，总 Epochs {epochs}, Batch Size {batch_size}, Learning Rate {lr}\n')
     start = time.time()
     for epoch in range(epochs):
         # train
@@ -160,11 +168,16 @@ def main():
         val_f1_list.append(f1)
         val_auc_list.append(auc)
 
-        print("| {:^6} | {:^10} | {:^17} | {:^19} | {:^9} | {:^6} | {:^8} | {:^6} |".format(
+        # 综合考虑 Accuracy, F1, AUC 的加权平均值
+        combined_metric = 0.6 * accuracy + 0.2 * f1 + 0.2 * auc  # 可以调整权重
+        combined_metric_list.append(combined_metric)
+
+        print("| {:^6} | {:^10} | {:^17} | {:^19} | {:^9} | {:^6} | {:^8} | {:^6} | {:^15} |".format(
             "Epoch", "Train Loss", "Training Accuracy", "Validation Accuracy", "Precision", "Recall", "F1-Score",
-            "AUC"))
-        print("| {:^6} | {:^10.3f} | {:^17.3f} | {:^19.3f} | {:^9.3f} | {:^6.3f} | {:^8.3f} | {:^6.3f} |\n".format(
-            epoch + 1, train_loss, train_accuracy, accuracy, precision, recall, f1, auc))
+            "AUC", "Combined Metric"))
+        print(
+            "| {:^6} | {:^10.3f} | {:^17.3f} | {:^19.3f} | {:^9.3f} | {:^6.3f} | {:^8.3f} | {:^6.3f} | {:^15.3f} |\n".format(
+                epoch + 1, train_loss, train_accuracy, accuracy, precision, recall, f1, auc, combined_metric))
 
         # todo: ROC metric
         # # 绘制 ROC 曲线
@@ -177,17 +190,27 @@ def main():
         # plt.legend(loc="lower right")
         # plt.show()
 
-        # 保存最佳模型，综合考虑 Accuracy, F1, AUC 的加权平均值
-        combined_metric = 0.6 * accuracy + 0.2 * f1 + 0.2 * auc  # 可以调整权重
+        # 保存最佳模型，并使用早停法
         if combined_metric > best_metric:
             best_metric = combined_metric
             saved_acc = accuracy
             torch.save(net.state_dict(), save_path)
             print(f'Save model, Epoch {epoch + 1}, Combined Metric {combined_metric:.3f}, Accuracy {accuracy:.3f}\n')
+            counter = 0
+        else:
+            counter += 1
+            if counter >= patience:
+                early_stop = True
+                break
 
     end = time.time()
     minutes = (end - start) / 60
-    print(f'模型训练结束，用时 {minutes:.3f} 分钟，Best Combined Metric {best_metric:.3f}, Accuracy {saved_acc:.3f}\n')
+    if early_stop:
+        print(
+            f'早停法：训练提前停止，用时 {minutes:.3f} 分钟，Best Combined Metric {best_metric:.3f}, Accuracy {saved_acc:.3f}\n')
+    else:
+        print(
+            f'模型训练结束，用时 {minutes:.3f} 分钟，Best Combined Metric {best_metric:.3f}, Accuracy {saved_acc:.3f}\n')
 
     # 绘制损失和准确率曲线
     plt.figure()
@@ -198,6 +221,23 @@ def main():
     plt.ylabel('Value')
     plt.title('Loss and Accuracy')
     plt.legend()
+    plt.show()
+    # 绘制曲线
+    plot(val_precision_list, epochs, 'Precision')
+    plot(val_recall_list, epochs, 'Recall')
+    plot(val_f1_list, epochs, 'F1-Score')
+    plot(val_auc_list, epochs, 'AUC')
+    plot(combined_metric_list, epochs, 'Combined Metric')
+
+
+def plot(plt_list, epochs, label):
+    # 绘制曲线
+    plt.figure()
+    plt.plot(range(1, epochs + 1), plt_list)
+    plt.xlabel('Epochs')
+    plt.ylabel(label)
+    plt.title(label)
+    # plt.legend()
     plt.show()
 
 
