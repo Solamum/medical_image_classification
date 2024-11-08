@@ -1,8 +1,10 @@
 #数据集不上传到git
 data/
-
 # resnet预训练参数
 *.pth
+# temp结果
+metrics_result/temp/
+
 
 # Byte编译的Python文件
 *.pyc

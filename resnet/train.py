@@ -95,7 +95,7 @@ def main():
     # 开始训练
     best_metric = 0.0  # 最佳综合指标，这里取 Accuracy, F1-Score, AUC 的加权平均值
     saved_acc = 0.0  # 保存的最佳模型的准确率
-    save_path = '../model/resNet34.pth'
+    save_path = '../model/temp/resNet34.pth'
     train_steps = len(train_loader)
 
     # 早停法：当连续 patience 个 epoch 验证集指标没有提升时，提前停止训练
@@ -196,7 +196,7 @@ def main():
             plt.ylabel('True Positive Rate')
             plt.title('ROC Curve')
             plt.legend(loc="lower right")
-            plt.savefig(os.path.join('../metrics_result', 'ROC Curve.png'))
+            plt.savefig(os.path.join('../metrics_result/temp', 'ROC Curve.png'))
             plt.show()
 
         else:
@@ -225,7 +225,7 @@ def main():
     plt.ylabel('Value')
     plt.title('Loss and Accuracy')
     plt.legend()
-    plt.savefig(os.path.join('../metrics_result', 'Loss and Accuracy.png'))
+    plt.savefig(os.path.join('../metrics_result/temp', 'Loss and Accuracy.png'))
     plt.show()
     # 绘制曲线
     plot(val_precision_list, stop_epoch, 'Precision')
@@ -235,7 +235,7 @@ def main():
     plot(combined_metric_list, stop_epoch, 'Combined Metric')
 
 
-def plot(plt_list, epochs, label, path='../metrics_result'):
+def plot(plt_list, epochs, label, path='../metrics_result/temp'):
     # 绘制曲线
     plt.figure()
     plt.plot(range(1, epochs + 1), plt_list)
