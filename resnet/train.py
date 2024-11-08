@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import torch
 import torch.nn as nn
 import torch.optim as optim
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, roc_curve
 from torch.utils.data import DataLoader
 from torchvision import transforms, datasets
 from tqdm import tqdm
@@ -21,7 +21,7 @@ def main():
 
     # 超参数
     batch_size = 16
-    epochs = 50
+    epochs = 30
     lr = 0.0001
 
     # 数据加载和预处理
@@ -95,13 +95,14 @@ def main():
     # 开始训练
     best_metric = 0.0  # 最佳综合指标，这里取 Accuracy, F1-Score, AUC 的加权平均值
     saved_acc = 0.0  # 保存的最佳模型的准确率
-    save_path = '../model/resNet34-best.pth'
+    save_path = '../model/resNet34.pth'
     train_steps = len(train_loader)
 
     # 早停法：当连续 patience 个 epoch 验证集指标没有提升时，提前停止训练
-    patience = 5  # 根据需要调整
+    patience = 10  # 根据需要调整
     counter = 0
     early_stop = False
+    stop_epoch = 0
 
     print(f'开始训练，总 Epochs {epochs}, Batch Size {batch_size}, Learning Rate {lr}\n')
     start = time.time()
@@ -179,65 +180,71 @@ def main():
             "| {:^6} | {:^10.3f} | {:^17.3f} | {:^19.3f} | {:^9.3f} | {:^6.3f} | {:^8.3f} | {:^6.3f} | {:^15.3f} |\n".format(
                 epoch + 1, train_loss, train_accuracy, accuracy, precision, recall, f1, auc, combined_metric))
 
-        # todo: ROC metric
-        # # 绘制 ROC 曲线
-        # fpr, tpr, thresholds = roc_curve(all_labels, all_probs)
-        # plt.figure()
-        # plt.plot(fpr, tpr, label=f'ROC curve (area = {auc:.3f})')
-        # plt.xlabel('False Positive Rate')
-        # plt.ylabel('True Positive Rate')
-        # plt.title('ROC Curve')
-        # plt.legend(loc="lower right")
-        # plt.show()
-
-        # 保存最佳模型，并使用早停法
+        # 保存最佳模型
         if combined_metric > best_metric:
             best_metric = combined_metric
             saved_acc = accuracy
             torch.save(net.state_dict(), save_path)
             print(f'Save model, Epoch {epoch + 1}, Combined Metric {combined_metric:.3f}, Accuracy {accuracy:.3f}\n')
             counter = 0
+
+            # 绘制 ROC 曲线
+            fpr, tpr, thresholds = roc_curve(all_labels, all_probs)
+            plt.figure()
+            plt.plot(fpr, tpr, label=f'ROC Curve (area = {auc:.3f})')
+            plt.xlabel('False Positive Rate')
+            plt.ylabel('True Positive Rate')
+            plt.title('ROC Curve')
+            plt.legend(loc="lower right")
+            plt.savefig(os.path.join('../metrics_result', 'ROC Curve.png'))
+            plt.show()
+
         else:
             counter += 1
             if counter >= patience:
                 early_stop = True
+                stop_epoch = epoch + 1
                 break
 
     end = time.time()
     minutes = (end - start) / 60
     if early_stop:
         print(
-            f'早停法：训练提前停止，用时 {minutes:.3f} 分钟，Best Combined Metric {best_metric:.3f}, Accuracy {saved_acc:.3f}\n')
+            f'早停法：训练提前停止，Stop Epoch {stop_epoch + 1}，用时 {minutes:.3f} 分钟，Best Combined Metric {best_metric:.3f}, Accuracy {saved_acc:.3f}\n')
     else:
+        stop_epoch = epochs
         print(
             f'模型训练结束，用时 {minutes:.3f} 分钟，Best Combined Metric {best_metric:.3f}, Accuracy {saved_acc:.3f}\n')
 
     # 绘制损失和准确率曲线
     plt.figure()
-    plt.plot(range(1, epochs + 1), train_loss_list, label='Train Loss')
-    plt.plot(range(1, epochs + 1), val_acc_list, label='Validation Accuracy')
-    plt.plot(range(1, epochs + 1), train_acc_list, label='Training Accuracy')
+    plt.plot(range(1, stop_epoch + 1), train_loss_list, label='Train Loss')
+    plt.plot(range(1, stop_epoch + 1), val_acc_list, label='Validation Accuracy')
+    plt.plot(range(1, stop_epoch + 1), train_acc_list, label='Training Accuracy')
     plt.xlabel('Epochs')
     plt.ylabel('Value')
     plt.title('Loss and Accuracy')
     plt.legend()
+    plt.savefig(os.path.join('../metrics_result', 'Loss and Accuracy.png'))
     plt.show()
     # 绘制曲线
-    plot(val_precision_list, epochs, 'Precision')
-    plot(val_recall_list, epochs, 'Recall')
-    plot(val_f1_list, epochs, 'F1-Score')
-    plot(val_auc_list, epochs, 'AUC')
-    plot(combined_metric_list, epochs, 'Combined Metric')
+    plot(val_precision_list, stop_epoch, 'Precision')
+    plot(val_recall_list, stop_epoch, 'Recall')
+    plot(val_f1_list, stop_epoch, 'F1-Score')
+    plot(val_auc_list, stop_epoch, 'AUC')
+    plot(combined_metric_list, stop_epoch, 'Combined Metric')
 
 
-def plot(plt_list, epochs, label):
+def plot(plt_list, epochs, label, path='../metrics_result'):
     # 绘制曲线
     plt.figure()
     plt.plot(range(1, epochs + 1), plt_list)
     plt.xlabel('Epochs')
     plt.ylabel(label)
+    plt.ylim(0, 1)
     plt.title(label)
     # plt.legend()
+    plt.savefig(os.path.join(path, label + '.png'))
     plt.show()
 
 

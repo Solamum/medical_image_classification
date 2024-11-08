@@ -19,9 +19,6 @@ venv/
 .idea/
 *.iml
 
-# 日志文件
-*.log
-
 # Jupyter Notebook检查点
 .ipynb_checkpoints/
 

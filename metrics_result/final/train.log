@@ -1,0 +1,177 @@
+
+using cuda:0 device.
+Using 8 dataloader workers every process
+using 1639 images for training, 250 images for validation.
+
+开始训练，总 Epochs 30, Batch Size 16, Learning Rate 0.0001
+
+train epoch[1/30] loss:0.333: 100%|██████████| 103/103 [00:25<00:00,  4.11it/s]
+valid epoch[1/30]: 100%|██████████| 16/16 [00:21<00:00,  1.37s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   1    |   0.410    |       0.813       |        0.852        |   0.865   | 0.893  |  0.879   | 0.935  |      0.874      |
+
+Save model, Epoch 1, Combined Metric 0.874, Accuracy 0.852
+
+train epoch[2/30] loss:0.609: 100%|██████████| 103/103 [00:25<00:00,  4.10it/s]
+valid epoch[2/30]: 100%|██████████| 16/16 [00:22<00:00,  1.39s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   2    |   0.247    |       0.905       |        0.916        |   0.945   | 0.913  |  0.929   | 0.971  |      0.930      |
+
+Save model, Epoch 2, Combined Metric 0.930, Accuracy 0.916
+
+train epoch[3/30] loss:0.210: 100%|██████████| 103/103 [00:24<00:00,  4.19it/s]
+valid epoch[3/30]: 100%|██████████| 16/16 [00:21<00:00,  1.34s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   3    |   0.228    |       0.912       |        0.844        |   0.899   | 0.833  |  0.865   | 0.930  |      0.865      |
+
+train epoch[4/30] loss:0.243: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[4/30]: 100%|██████████| 16/16 [00:22<00:00,  1.38s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   4    |   0.171    |       0.938       |        0.912        |   0.957   | 0.893  |  0.924   | 0.974  |      0.927      |
+
+train epoch[5/30] loss:0.009: 100%|██████████| 103/103 [00:24<00:00,  4.28it/s]
+valid epoch[5/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   5    |   0.147    |       0.941       |        0.944        |   0.966   | 0.940  |  0.953   | 0.985  |      0.954      |
+
+Save model, Epoch 5, Combined Metric 0.954, Accuracy 0.944
+
+train epoch[6/30] loss:0.039: 100%|██████████| 103/103 [00:24<00:00,  4.26it/s]
+valid epoch[6/30]: 100%|██████████| 16/16 [00:21<00:00,  1.33s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   6    |   0.142    |       0.944       |        0.956        |   0.960   | 0.967  |  0.963   | 0.991  |      0.965      |
+
+Save model, Epoch 6, Combined Metric 0.965, Accuracy 0.956
+
+train epoch[7/30] loss:0.011: 100%|██████████| 103/103 [00:23<00:00,  4.30it/s]
+valid epoch[7/30]: 100%|██████████| 16/16 [00:21<00:00,  1.33s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   7    |   0.118    |       0.955       |        0.936        |   0.986   | 0.907  |  0.944   | 0.986  |      0.948      |
+
+train epoch[8/30] loss:0.045: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[8/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   8    |   0.126    |       0.951       |        0.928        |   0.912   | 0.973  |  0.942   | 0.969  |      0.939      |
+
+train epoch[9/30] loss:0.407: 100%|██████████| 103/103 [00:23<00:00,  4.30it/s]
+valid epoch[9/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   9    |   0.141    |       0.946       |        0.944        |   1.000   | 0.907  |  0.951   | 0.993  |      0.955      |
+
+train epoch[10/30] loss:0.215: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[10/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   10   |   0.101    |       0.960       |        0.916        |   0.927   | 0.933  |  0.930   | 0.972  |      0.930      |
+
+train epoch[11/30] loss:0.016: 100%|██████████| 103/103 [00:23<00:00,  4.32it/s]
+valid epoch[11/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   11   |   0.083    |       0.967       |        0.900        |   0.984   | 0.847  |  0.910   | 0.992  |      0.920      |
+
+train epoch[12/30] loss:1.270: 100%|██████████| 103/103 [00:23<00:00,  4.30it/s]
+valid epoch[12/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   12   |   0.088    |       0.971       |        0.944        |   0.972   | 0.933  |  0.952   | 0.988  |      0.955      |
+
+train epoch[13/30] loss:0.645: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[13/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   13   |   0.107    |       0.960       |        0.964        |   0.961   | 0.980  |  0.970   | 0.991  |      0.971      |
+
+Save model, Epoch 13, Combined Metric 0.971, Accuracy 0.964
+
+train epoch[14/30] loss:0.027: 100%|██████████| 103/103 [00:24<00:00,  4.29it/s]
+valid epoch[14/30]: 100%|██████████| 16/16 [00:21<00:00,  1.33s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   14   |   0.089    |       0.961       |        0.928        |   1.000   | 0.880  |  0.936   | 0.988  |      0.942      |
+
+train epoch[15/30] loss:0.012: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[15/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   15   |   0.091    |       0.968       |        0.952        |   0.948   | 0.973  |  0.961   | 0.993  |      0.962      |
+
+train epoch[16/30] loss:0.425: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[16/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   16   |   0.081    |       0.970       |        0.924        |   0.978   | 0.893  |  0.934   | 0.985  |      0.938      |
+
+train epoch[17/30] loss:0.048: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[17/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   17   |   0.073    |       0.976       |        0.932        |   0.978   | 0.907  |  0.941   | 0.976  |      0.943      |
+
+train epoch[18/30] loss:0.003: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[18/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   18   |   0.077    |       0.974       |        0.920        |   0.951   | 0.913  |  0.932   | 0.971  |      0.933      |
+
+train epoch[19/30] loss:0.050: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[19/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   19   |   0.088    |       0.971       |        0.928        |   0.971   | 0.907  |  0.938   | 0.979  |      0.940      |
+
+train epoch[20/30] loss:0.011: 100%|██████████| 103/103 [00:24<00:00,  4.28it/s]
+valid epoch[20/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   20   |   0.089    |       0.971       |        0.884        |   0.992   | 0.813  |  0.894   | 0.990  |      0.907      |
+
+train epoch[21/30] loss:0.016: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[21/30]: 100%|██████████| 16/16 [00:21<00:00,  1.33s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   21   |   0.073    |       0.968       |        0.900        |   0.977   | 0.853  |  0.911   | 0.990  |      0.920      |
+
+train epoch[22/30] loss:0.343: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[22/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   22   |   0.074    |       0.970       |        0.956        |   0.954   | 0.973  |  0.964   | 0.987  |      0.964      |
+
+train epoch[23/30] loss:0.023: 100%|██████████| 103/103 [00:23<00:00,  4.32it/s]
+valid epoch[23/30]: 100%|██████████| 16/16 [00:21<00:00,  1.33s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   23   |   0.067    |       0.976       |        0.964        |   0.973   | 0.967  |  0.970   | 0.993  |      0.971      |
+
+Save model, Epoch 23, Combined Metric 0.971, Accuracy 0.964
+
+train epoch[24/30] loss:0.000: 100%|██████████| 103/103 [00:23<00:00,  4.30it/s]
+valid epoch[24/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   24   |   0.064    |       0.977       |        0.972        |   0.980   | 0.973  |  0.977   | 0.995  |      0.977      |
+
+Save model, Epoch 24, Combined Metric 0.977, Accuracy 0.972
+
+train epoch[25/30] loss:0.544: 100%|██████████| 103/103 [00:23<00:00,  4.30it/s]
+valid epoch[25/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   25   |   0.053    |       0.984       |        0.968        |   0.993   | 0.953  |  0.973   | 0.989  |      0.973      |
+
+train epoch[26/30] loss:0.002: 100%|██████████| 103/103 [00:23<00:00,  4.35it/s]
+valid epoch[26/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   26   |   0.078    |       0.968       |        0.980        |   0.993   | 0.973  |  0.983   | 0.994  |      0.984      |
+
+Save model, Epoch 26, Combined Metric 0.984, Accuracy 0.980
+
+train epoch[27/30] loss:0.003: 100%|██████████| 103/103 [00:24<00:00,  4.29it/s]
+valid epoch[27/30]: 100%|██████████| 16/16 [00:21<00:00,  1.31s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   27   |   0.050    |       0.983       |        0.956        |   0.960   | 0.967  |  0.963   | 0.992  |      0.965      |
+
+train epoch[28/30] loss:0.001: 100%|██████████| 103/103 [00:24<00:00,  4.27it/s]
+valid epoch[28/30]: 100%|██████████| 16/16 [00:21<00:00,  1.32s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   28   |   0.099    |       0.970       |        0.892        |   0.984   | 0.833  |  0.903   | 0.987  |      0.913      |
+
+train epoch[29/30] loss:0.175: 100%|██████████| 103/103 [00:23<00:00,  4.31it/s]
+valid epoch[29/30]: 100%|██████████| 16/16 [00:21<00:00,  1.33s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   29   |   0.064    |       0.979       |        0.976        |   0.980   | 0.980  |  0.980   | 0.991  |      0.980      |
+
+train epoch[30/30] loss:0.158: 100%|██████████| 103/103 [00:24<00:00,  4.26it/s]
+valid epoch[30/30]: 100%|██████████| 16/16 [00:21<00:00,  1.33s/it]
+| Epoch  | Train Loss | Training Accuracy | Validation Accuracy | Precision | Recall | F1-Score |  AUC   | Combined Metric |
+|   30   |   0.060    |       0.977       |        0.956        |   0.960   | 0.967  |  0.963   | 0.990  |      0.964      |
+
+模型训练结束，用时 22.661 分钟，Best Combined Metric 0.984, Accuracy 0.980
+
+
+进程已结束，退出代码为 0
